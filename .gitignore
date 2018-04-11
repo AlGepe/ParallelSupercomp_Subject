@@ -1,0 +1,16 @@
+*
+!*.*
+!*/
+*.out
+*DS_Store*
+:x
+Resources/
+*.zip
+*make
+*common*
+*/.DS*
+*Makefile
+*.pdf
+*.png
+*.sw*
+*.o

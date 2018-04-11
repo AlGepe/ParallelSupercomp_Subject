@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #define RADIUS        3
-#define NUM_ELEMENTS  1000 
+#define NUM_ELEMENTS  1000000
 
 static void handleError(cudaError_t err, const char *file, int line ) {
 	if (err != cudaSuccess) {
@@ -16,10 +16,11 @@ static void handleError(cudaError_t err, const char *file, int line ) {
 __global__ void stencil_1d(int *in, int *out) 
 {
 	//PUT YOUR CODE HERE
-	int array_length = sizeof(*in)/sizeof(in[0]);
+	// int array_length = sizeof(*in)/sizeof(in[0]);
 	// Run whole array
-	int i = threadIdx.x;
-		// Calculate for all neighbours and check
+	int i = (blockIdx.x * blockDim.x) + threadIdx.x;
+	// Calculate for all neighbours and check
+	/*
 		for(int j = -RADIUS; j <= RADIUS; j++)
 		{
 			if(i + j < 0)
@@ -32,11 +33,14 @@ __global__ void stencil_1d(int *in, int *out)
 			}
 			out[i] += in[i+j];
 		}
+		*/
+		out[i] = in[i];
 }
 
 void cpu_stencil_1d(int *in, int *out) {
 	//PUT YOUR CODE HERE
 	//PUT YOUR CODE HERE
+	/*
 	int array_length = sizeof(*in)/sizeof(in[0]);
 	// Run whole array
 	for(int i = 0; i < array_length; i++)
@@ -56,14 +60,20 @@ void cpu_stencil_1d(int *in, int *out) {
 		}
 	}
 
+	*/
+	for(int i = 0; i < NUM_ELEMENTS; i++)
+	{
+		out[i] = in[i];
+	}
 }
 
 int main() {
 	//PUT YOUR CODE HERE - INPUT AND OUTPUT ARRAYS 
+	std::cout<<"test"<<std::endl;
 	int h_in[NUM_ELEMENTS],
-				h_out[NUM_ELEMENTS], 
-				*d_in,
-				*d_out;
+			h_out[NUM_ELEMENTS], 
+			*d_in,
+			*d_out;
 
 	for(int i = 0; i < NUM_ELEMENTS; i++)
 	{
@@ -82,7 +92,9 @@ int main() {
 
 	//PUT YOUR CODE HERE - KERNEL EXECUTION
 
-	stencil_1d<<<1, 1000>>>(d_in, d_out);
+	std::cout<<"after load mem, before kernel"<<std::endl;
+	
+	stencil_1d<<<(int) (NUM_ELEMENTS / 1000), 1000>>>(d_in, d_out);
 
 	cudaCheck(cudaPeekAtLastError());
 	std::cout << "Done!" << std::endl;
@@ -113,5 +125,3 @@ int main() {
 
 	return 0;
 }
-
-
